@@ -5,6 +5,7 @@ import { ToastContainer } from 'react-toastify';
 import "react-toastify/dist/ReactToastify.css";
 import ProfileScreen from "./container/ProfileScreen";
 import Layout from "./components/Layout";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   const router = createBrowserRouter(
@@ -13,7 +14,9 @@ function App() {
         <Route index element={<Loginscreen />} />
         <Route path="signup" element={<SignupScreen />} />
         <Route element={<Layout />} >
-          <Route path="profile" element={<ProfileScreen />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="profile" element={<ProfileScreen />} />
+          </Route>
         </Route>
       </Route>
     )

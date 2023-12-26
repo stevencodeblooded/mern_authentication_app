@@ -30,10 +30,10 @@ const Loginscreen = () => {
     try {
       const res = await fetch('http://localhost:5000/api/users/signup', {
         method: 'POST',
-        ContentType: 'Application/JSON',
-        body: JSON.stringify({
-          formData
-        })
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
       })
 
       const data = await res.json()
@@ -41,7 +41,7 @@ const Loginscreen = () => {
 
       navigate('/')
     } catch (error) {
-      toast.error(error?.message || error)
+      toast.error(error?.message || error, { theme: "colored" })
     }
   }
   
@@ -53,7 +53,7 @@ const Loginscreen = () => {
             <img src={authLogo} alt="Auth Logo" className=' w-20' />
           </Link>
           <h1 className='text-3xl font-semibold'>Create your account</h1>
-          <h2 className='text-lg font-semibold'>Have an account? <span><Link to={'/'} className='text-blue-400 hover:text-blue-800 transition-all'>Log in now</Link></span></h2>
+          <h2 className='text-lg font-semibold'>Have an account? <span><Link to={'/'} className='text-blue-400 hover:text-blue-800 transition-all hover:border-b-2 border-blue-800'>Log in now</Link></span></h2>
         </div>
         <form onSubmit={handleFormSubmit} className='flex flex-col gap-5'>
           <input 
@@ -83,7 +83,7 @@ const Loginscreen = () => {
             onChange={handleChange}
           />
 
-          <button 
+          <button
             type='submit' 
             className='bg-blue-800 hover:bg-blue-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center'
           >

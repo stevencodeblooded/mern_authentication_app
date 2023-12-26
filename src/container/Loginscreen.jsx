@@ -29,8 +29,10 @@ const Loginscreen = () => {
     try {
       const res = await fetch('http://localhost:5000/api/users/auth', {
         method: "POST", 
-        ContentType: "Application/JSON",
-        body: JSON.stringify({formData})
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(formData)
       }) 
   
       const data = await res.json()
@@ -38,7 +40,7 @@ const Loginscreen = () => {
   
       navigate('/profile')
     } catch (error) {
-      toast.error(error?.message || error)
+      toast.error(error?.message || error, { theme: "colored" })
     }
   }
   
@@ -50,7 +52,7 @@ const Loginscreen = () => {
             <img src={authLogo} alt="Auth Logo" className=' w-20' />
           </Link>
           <h1 className='text-3xl font-semibold'>Log in to your account</h1>
-          <h2 className='text-lg font-semibold'>Don't have an account? <span><Link to={'signup'} className='text-blue-400 hover:text-blue-800 transition-all'>Sign Up</Link></span></h2>
+          <h2 className='text-lg font-semibold'>Don't have an account? <span><Link to={'signup'} className='text-blue-400 hover:text-blue-800 transition-all hover:border-b-2 border-blue-800'>Sign Up</Link></span></h2>
         </div>
         <form onSubmit={handleFormSubmit} className='flex flex-col gap-5'>
           <input 
