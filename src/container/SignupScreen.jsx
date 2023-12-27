@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { Link, useNavigate, useNavigation } from 'react-router-dom'
 import { useState } from 'react';
 import loginImage from '../assets/screenImage.jpg'
 import authLogo from '../assets/authLogo.png'
@@ -8,6 +8,8 @@ import { toast } from 'react-toastify';
 
 const Loginscreen = () => {
   const navigate = useNavigate()
+  const navigation = useNavigation()
+  const state = navigation.state
   const [formData, setFormDate] = useState({
     name: '',
     email: '',
@@ -36,10 +38,17 @@ const Loginscreen = () => {
         body: JSON.stringify(formData)
       })
 
-      const data = await res.json()
-      console.log(data);
+      if (res.ok) {
+        const data = await res.json()
+        toast.success(data.message);
+        console.log(data);
+        navigate('/')
+      } else {
+        const data = await res.json()
+        console.log(data);
+        toast.error(data.message);
+      }
 
-      navigate('/')
     } catch (error) {
       toast.error(error?.message || error, { theme: "colored" })
     }
@@ -84,10 +93,11 @@ const Loginscreen = () => {
           />
 
           <button
+            disabled={ state === 'submitting' }
             type='submit' 
             className='bg-blue-800 hover:bg-blue-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center'
           >
-            Sign up <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+            { state === 'submitting' ? 'Signing up...' : 'Sign up'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
           </button>
 
           <button 

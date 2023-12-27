@@ -6,6 +6,8 @@ import "react-toastify/dist/ReactToastify.css";
 import ProfileScreen from "./container/ProfileScreen";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
+import { Provider } from "react-redux";
+import { store } from "./redux/store/store";
 
 function App() {
   const router = createBrowserRouter(
@@ -23,10 +25,12 @@ function App() {
   )
   return (
     <>
-      <RouterProvider 
-        router={router}
-      />
-      <ToastContainer />
+      <Provider store={store}>
+        <RouterProvider 
+          router={router}
+        />
+        <ToastContainer />
+      </Provider>
     </>
   )
 }

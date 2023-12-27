@@ -3,21 +3,13 @@ import profile from '../assets/profile_pic.jpeg'
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toast } from 'react-toastify';
+import { useNavigation } from 'react-router-dom';
 
 
 const ProfileScreen = () => {
-  //Fetch the User Data from DB
-  // const userId = '658aed5a4764c519006ddc58'
-  // try {
-  //   const res = await fetch(`http://localhost:5000/api/users/profile/${userId}`)
 
-  //   const data = await res.json()
-  //   console.log(data);
-
-  // } catch (error) {
-  //   toast.error(error?.message || error)
-  // }
-
+  const navigation = useNavigation()
+  const state = navigation.state
   const [formData, setFormDate] = useState({
     name: "",
     email: "",
@@ -38,7 +30,7 @@ const ProfileScreen = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const userId = '658aed5a4764c519006ddc58'
+    const userId = '658c310c741a12bc81b67deb'
 
     try {
       const res = await fetch(`http://localhost:5000/api/users/profile/${userId}`, {
@@ -46,10 +38,17 @@ const ProfileScreen = () => {
         headers: {
           'Content-Type': 'application/json'
         },
+        body: JSON.stringify(formData)
       })
 
-      const data = await res.json()
-      console.log(data);
+      if (res.ok) {
+        const data = await res.json()
+        toast.success(data.message, { theme: "colored" });
+      } else {
+        const data = await res.json()
+        toast.error(data.message, { theme: "colored" } );
+      }
+
     } catch (error) {
       toast.error(error?.message || error, { theme: "colored" })
     }
@@ -60,7 +59,7 @@ const ProfileScreen = () => {
   const handleDelete = async (e) => {
     e.preventDefault()
 
-    const userId = '658aed5a4764c519006ddc58'
+    const userId = '658c310c741a12bc81b67d'
 
     try {
       const res = await fetch(`http://localhost:5000/api/users/profile/${userId}`, {
@@ -70,8 +69,13 @@ const ProfileScreen = () => {
         },
       })
 
-      const data = await res.json()
-      console.log(data);
+      if (res.ok) {
+        const data = await res.json()
+        toast.success(data.message, { theme: "colored" });
+      } else {
+        const data = await res.json()
+        toast.error(data.message, { theme: "colored" });
+      }
     } catch (error) {
       toast.error(error?.message || error, { theme: "colored" })
     }
@@ -82,7 +86,7 @@ const ProfileScreen = () => {
   const handleSignOut = (e) => {
     e.preventDefault()
 
-    console.log('Signing User Out');
+    toast.success('Signed User Out');
 
   }
 
@@ -120,10 +124,11 @@ const ProfileScreen = () => {
           />
 
           <button 
+            disabled={state  === 'submitting' }
             type='submit' 
             className='bg-blue-800 hover:bg-blue-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center'
           >
-            Update Profile <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+            {state === 'submitting' ? 'Updating...' : 'Update Profile' } <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
           </button>
         </form>
 
@@ -134,9 +139,10 @@ const ProfileScreen = () => {
               name="id" 
             />
             <button 
+              disabled={ state === 'submitting' }
               className='flex items-center gap-2 bg-red-800 hover:bg-red-500 transition-all text-white py-2 px-6 sm:px-8 rounded-md font-semibold '
             >
-              Delete <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+              {state === 'submitting' ? 'Deleting...' : 'Delete'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
             </button>
           </form>
 
@@ -146,9 +152,10 @@ const ProfileScreen = () => {
               name="id" 
             />
             <button 
+              disabled={ state === 'submitting' }
               className='flex items-center gap-2 bg-red-800 hover:bg-red-500 transition-all text-white py-2 px-6 sm:px-8 rounded-md font-semibold '
             >
-              Sign Out <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+              {state === 'submitting' ? 'Signing Out...' : 'Sign Out'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
             </button>
           </form>
         </div>
