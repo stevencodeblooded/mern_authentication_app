@@ -4,8 +4,11 @@ import profilePic from '../assets/profile_pic.jpeg'
 import { useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons'
+import { useSelector } from 'react-redux'
 
 const Navbar = () => {
+  const { currentUser } = useSelector( state => state.user )
+
   const [showProfileDropDown, setShowProfileDropDown] = useState(false);
   const timeoutRef = useRef(null);
 
@@ -28,8 +31,8 @@ const Navbar = () => {
             <img src={logo} alt="Logo" className=' w-10 sm:w-14 hover:opacity-85' />
           </Link>
           <ul className='font-semibold text-white flex items-center gap-10'>
-            <li><Link to={'/'} className=' hover:opacity-85'>Home</Link></li>
-            <li><Link to={'/'} className=' hover:opacity-85'>About</Link></li>
+            <li><Link to={'home'} className=' hover:opacity-85'>Home</Link></li>
+            <li><Link to={'about'} className=' hover:opacity-85'>About</Link></li>
             <li className='relative'>
               <img 
                 src={profilePic} 
@@ -47,8 +50,8 @@ const Navbar = () => {
                       <div className='flex items-center gap-2'>
                         <img src={profilePic} alt="profile" className='w-12 h-12 rounded-full' />
                         <div>
-                          <h3 className='text-md font-semibold'>Steven Ochieng</h3>
-                          <p className='text-sm font-normal'>steven.ochieng432@gmail.com</p>
+                          <h3 className='text-md font-semibold'>{ currentUser.name }</h3>
+                          <p className='text-sm font-normal'>{ currentUser.email }</p>
                         </div>
                       </div>
                       <form>
@@ -61,8 +64,8 @@ const Navbar = () => {
 
                       <hr className='border border-blue-950' />
                       <div className='flex flex-col gap-2'>
-                        <Link to={'profile'}>Profile</Link>
-                        <Link to={'/referal'}>Refer a Friend</Link>
+                        <Link to={'profile'} onClick={() => setShowProfileDropDown(false)}>Profile</Link>
+                        <Link to={'referral'} onClick={() => setShowProfileDropDown(false)}>Refer a Friend</Link>
                       </div>
 
                     </div>

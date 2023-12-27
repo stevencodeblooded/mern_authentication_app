@@ -4,15 +4,18 @@ import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toast } from 'react-toastify';
 import { useNavigation } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 
 
 const ProfileScreen = () => {
 
+  const { currentUser } = useSelector( state => state.user)
+
   const navigation = useNavigation()
   const state = navigation.state
   const [formData, setFormDate] = useState({
-    name: "",
-    email: "",
+    name: currentUser.name,
+    email: currentUser.email,
     password: ""
   });
 

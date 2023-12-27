@@ -1,15 +1,21 @@
-import { Link, useNavigate, useNavigation } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react';
 import loginImage from '../assets/screenImage.jpg'
 import authLogo from '../assets/authLogo.png'
-import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUpRightFromSquare, faL } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toast } from 'react-toastify';
+import { useDispatch } from 'react-redux';
+import { signInFailure, signInStart, signInSuccess } from '../redux/slices/authSlice'
+import { useSelector } from 'react-redux';
 
 const Loginscreen = () => {
+  const dispatch = useDispatch()
+  const {loading, error} = useSelector( state => state.user )
   const navigate = useNavigate()
-  const navigation = useNavigation()
-  const state = navigation.state
+
+  console.log(error)
+  
   const [formData, setFormDate] = useState({
     email: '',
     password: ''
@@ -29,6 +35,7 @@ const Loginscreen = () => {
     e.preventDefault()
 
     try {
+      dispatch(signInStart())
       const res = await fetch('http://localhost:5000/api/users/auth', {
         method: "POST", 
         headers: {
@@ -40,17 +47,17 @@ const Loginscreen = () => {
       if (res.ok) {
         const data = await res.json()
         toast.success(data.message, { theme: "colored" });
-        console.log(data);
+        dispatch(signInSuccess(data.userNoPassword))
         navigate('/profile')
       } else {
         const data = await res.json()
-        console.log(data);
+        dispatch(signInFailure(data.message))
         toast.error(data.message, { theme: "colored" });
       }
-  
-  
+      
     } catch (error) {
       toast.error(error?.message || 'An error occurred during login', { theme: "colored" })
+      dispatch(signInFailure(error?.message))
     }
   }
   
@@ -84,11 +91,11 @@ const Loginscreen = () => {
           />
 
           <button 
-            disabled={ state === 'submitting'}
+            disabled={ loading }
             type='submit' 
-            className={`${state === 'submitting' ? 'bg-gray-400' : 'bg-blue-800'}  hover:bg-blue-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center`}
+            className={`${ loading ? 'bg-gray-400' : 'bg-blue-800'}  hover:bg-blue-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center`}
           >
-            {state === 'submitting' ? 'Logging in ...' : 'Login'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+            { loading ? 'Logging in ...' : 'Login'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
           </button>
 
           <button 
