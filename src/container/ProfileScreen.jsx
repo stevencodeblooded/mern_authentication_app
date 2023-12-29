@@ -37,7 +37,7 @@ const ProfileScreen = () => {
 
     try {
       dispatch(updateUserStart())
-      const res = await fetch(`http://localhost:5000/api/users/profile/${userId}`, {
+      const res = await fetch(`/api/users/profile/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -67,7 +67,7 @@ const ProfileScreen = () => {
 
     try {
       dispatch(deleteUserStart())
-      const res = await fetch(`http://localhost:5000/api/users/profile/${userId}`, {
+      const res = await fetch(`/api/users/profile/${userId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
@@ -96,7 +96,7 @@ const ProfileScreen = () => {
 
     try {
       dispatch(logoutStart())
-      const res = await fetch('http://localhost:5000/api/users/logout')
+      const res = await fetch('/api/users/logout')
 
       if (!res) {
         dispatch(logoutFailure())
@@ -149,7 +149,7 @@ const ProfileScreen = () => {
           <button 
             disabled={ loading }
             type='submit' 
-            className='bg-blue-800 hover:bg-blue-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center'
+            className={`${ loading ? 'bg-gray-400' : 'bg-blue-800'} hover:bg-blue-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center`}
           >
             { loading ? 'Updating...' : 'Update Profile' } <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
           </button>

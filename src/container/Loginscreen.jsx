@@ -2,20 +2,19 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useState } from 'react';
 import loginImage from '../assets/screenImage.jpg'
 import authLogo from '../assets/authLogo.png'
-import { faArrowUpRightFromSquare, faL } from '@fortawesome/free-solid-svg-icons';
+import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toast } from 'react-toastify';
 import { useDispatch } from 'react-redux';
 import { signInFailure, signInStart, signInSuccess } from '../redux/slices/authSlice'
 import { useSelector } from 'react-redux';
+import GoogleOAuth from '../components/GoogleOAuth';
 
 const Loginscreen = () => {
   const dispatch = useDispatch()
   const {loading, error} = useSelector( state => state.user )
   const navigate = useNavigate()
 
-  console.log(error)
-  
   const [formData, setFormDate] = useState({
     email: '',
     password: ''
@@ -36,11 +35,12 @@ const Loginscreen = () => {
 
     try {
       dispatch(signInStart())
-      const res = await fetch('http://localhost:5000/api/users/auth', {
+      const res = await fetch('/api/users/auth', {
         method: "POST", 
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify(formData)
       }) 
 
@@ -58,14 +58,6 @@ const Loginscreen = () => {
     } catch (error) {
       toast.error(error?.message || 'An error occurred during login', { theme: "colored" })
       dispatch(signInFailure(error?.message))
-    }
-  }
-
-  const handleGoogleClick = async () => {
-    try {
-     console.log('Hello');
-    } catch (error) {
-      toast.error('Could not login with Google', error);
     }
   }
   
@@ -106,13 +98,7 @@ const Loginscreen = () => {
             { loading ? 'Logging in ...' : 'Login'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
           </button>
 
-          <button 
-            type='button' 
-            onClick={handleGoogleClick}
-            className='bg-red-800 hover:bg-red-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center'
-          >
-              Continue with Google <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
-          </button>
+          <GoogleOAuth />
         </form>
       </div>
 

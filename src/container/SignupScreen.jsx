@@ -6,13 +6,13 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
 import { useDispatch, useSelector } from 'react-redux';
+import { signUpFailure, signUpStart, signUpSuccess } from '../redux/slices/authSlice';
+import GoogleOAuth from '../components/GoogleOAuth';
 
 const Loginscreen = () => {
-  const { loading, error } = useSelector( state => state.user )
-  const dispatch = useDispatch
+  const { loading } = useSelector( state => state.user )
+  const dispatch = useDispatch()
   const navigate = useNavigate()
-  const navigation = useNavigation()
-  const state = navigation.state
   const [formData, setFormDate] = useState({
     name: '',
     email: '',
@@ -33,33 +33,36 @@ const Loginscreen = () => {
     e.preventDefault()
 
     try {
-      const res = await fetch('http://localhost:5000/api/users/signup', {
+      dispatch(signUpStart())
+      const res = await fetch('/api/users/signup', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify(formData)
       })
 
       if (res.ok) {
         const data = await res.json()
+        dispatch(signUpSuccess(data.newUser))
         toast.success(data.message);
-        console.log(data);
         navigate('/')
       } else {
         const data = await res.json()
-        console.log(data);
+        dispatch(signUpFailure(data.message))
         toast.error(data.message);
       }
 
     } catch (error) {
+      dispatch(signUpFailure(error))
       toast.error(error?.message || error, { theme: "colored" })
     }
   }
 
   const handleGoogleClick = async () => {
     try {
-      
+      console.log('Google Au');
     } catch (error) {
       toast.error('Could not signup with google, try again later', error)
     }
@@ -104,21 +107,14 @@ const Loginscreen = () => {
           />
 
           <button
-            disabled={ state === 'submitting' }
+            disabled={ loading }
             type='submit' 
-            className='bg-blue-800 hover:bg-blue-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center'
+            className={`${ loading ? 'bg-gray-400' : 'bg-blue-800'}  hover:bg-blue-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center`}
           >
-            { state === 'submitting' ? 'Signing up...' : 'Sign up'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+            { loading ? 'Signing up...' : 'Sign up'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
           </button>
 
-          <button 
-            type='button' 
-            disabled={ loading }
-            onClick={handleGoogleClick}
-            className='bg-red-800 hover:bg-red-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center'
-          >
-            {loading ? 'Continuing with Google...' : 'Continue with Google' } <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
-          </button>
+          <GoogleOAuth />
         </form>
       </div>
 
