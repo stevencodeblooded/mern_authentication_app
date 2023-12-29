@@ -48,7 +48,7 @@ const Loginscreen = () => {
         const data = await res.json()
         toast.success(data.message, { theme: "colored" });
         dispatch(signInSuccess(data.userNoPassword))
-        navigate('/profile')
+        navigate('/home')
       } else {
         const data = await res.json()
         dispatch(signInFailure(data.message))
@@ -58,6 +58,14 @@ const Loginscreen = () => {
     } catch (error) {
       toast.error(error?.message || 'An error occurred during login', { theme: "colored" })
       dispatch(signInFailure(error?.message))
+    }
+  }
+
+  const handleGoogleClick = async () => {
+    try {
+     console.log('Hello');
+    } catch (error) {
+      toast.error('Could not login with Google', error);
     }
   }
   
@@ -100,6 +108,7 @@ const Loginscreen = () => {
 
           <button 
             type='button' 
+            onClick={handleGoogleClick}
             className='bg-red-800 hover:bg-red-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center'
           >
               Continue with Google <FontAwesomeIcon icon={faArrowUpRightFromSquare} />

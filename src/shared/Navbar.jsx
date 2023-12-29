@@ -8,7 +8,6 @@ import { useSelector } from 'react-redux'
 
 const Navbar = () => {
   const { currentUser } = useSelector( state => state.user )
-
   const [showProfileDropDown, setShowProfileDropDown] = useState(false);
   const timeoutRef = useRef(null);
 
@@ -23,6 +22,13 @@ const Navbar = () => {
     }, 300);
   };
 
+
+  const handleLogOut = (e) => {
+    e.preventDefault()
+
+    toast.success('Signed User Out');
+  }
+
   return (
     <div className='bg-blue-800'>
       <section className="max-w-4xl mx-auto">
@@ -35,7 +41,7 @@ const Navbar = () => {
             <li><Link to={'about'} className=' hover:opacity-85'>About</Link></li>
             <li className='relative'>
               <img 
-                src={profilePic} 
+                src={currentUser?.image} 
                 onMouseEnter={ showDropdown }
                 onMouseLeave={ hideDropdown }
                 onClick={() => setShowProfileDropDown(!showProfileDropDown)}
@@ -48,13 +54,14 @@ const Navbar = () => {
                   <div className='bg-blue-600 px-3 py-6 rounded-md shadow shadow-blue-900 w-72'>
                     <div className='flex flex-col gap-6'>
                       <div className='flex items-center gap-2'>
-                        <img src={profilePic} alt="profile" className='w-12 h-12 rounded-full' />
+                        <img src={currentUser.image} alt="profile" className='w-12 h-12 rounded-full' />
                         <div>
                           <h3 className='text-md font-semibold'>{ currentUser.name }</h3>
                           <p className='text-sm font-normal'>{ currentUser.email }</p>
                         </div>
                       </div>
-                      <form>
+                      <form onSubmit={handleLogOut}>
+                        <input type="hidden" name="id" />
                         <button 
                           className='flex items-center justify-center gap-3 bg-red-900 hover:bg-red-700 transition-all text-white py-2 rounded-md font-semibold w-full'
                         >

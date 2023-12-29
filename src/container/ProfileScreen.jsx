@@ -1,21 +1,23 @@
 import { useState } from 'react';
-import profile from '../assets/profile_pic.jpeg'
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toast } from 'react-toastify';
-import { useNavigation } from 'react-router-dom';
+import { useNavigation, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
-
+import { useDispatch } from 'react-redux';
+import { deleteUserFailure, deleteUserStart, deleteUserSuccess, logoutFailure, logoutStart, logoutSuccess, updateUserFailure, updateUserStart, updateUserSuccess } from '../redux/slices/authSlice';
 
 const ProfileScreen = () => {
 
-  const { currentUser } = useSelector( state => state.user)
-
+  const { currentUser, loading } = useSelector( state => state.user)
+  const userId = currentUser?._id
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
   const navigation = useNavigation()
   const state = navigation.state
   const [formData, setFormDate] = useState({
-    name: currentUser.name,
-    email: currentUser.email,
+    name: currentUser?.name,
+    email: currentUser?.email,
     password: ""
   });
 
@@ -33,9 +35,8 @@ const ProfileScreen = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
 
-    const userId = '658c310c741a12bc81b67deb'
-
     try {
+      dispatch(updateUserStart())
       const res = await fetch(`http://localhost:5000/api/users/profile/${userId}`, {
         method: 'PUT',
         headers: {
@@ -46,9 +47,11 @@ const ProfileScreen = () => {
 
       if (res.ok) {
         const data = await res.json()
+        dispatch(updateUserSuccess(data.newUser))
         toast.success(data.message, { theme: "colored" });
       } else {
         const data = await res.json()
+        dispatch(updateUserFailure(data.message))
         toast.error(data.message, { theme: "colored" } );
       }
 
@@ -62,9 +65,8 @@ const ProfileScreen = () => {
   const handleDelete = async (e) => {
     e.preventDefault()
 
-    const userId = '658c310c741a12bc81b67d'
-
     try {
+      dispatch(deleteUserStart())
       const res = await fetch(`http://localhost:5000/api/users/profile/${userId}`, {
         method: 'DELETE',
         headers: {
@@ -74,29 +76,47 @@ const ProfileScreen = () => {
 
       if (res.ok) {
         const data = await res.json()
+        dispatch(deleteUserSuccess(data.message))
         toast.success(data.message, { theme: "colored" });
+        navigate('/')
       } else {
         const data = await res.json()
+        dispatch(deleteUserFailure(data.message))
         toast.error(data.message, { theme: "colored" });
       }
     } catch (error) {
+      dispatch(deleteUserFailure(error))
       toast.error(error?.message || error, { theme: "colored" })
     }
-
   }
 
   //SignOut
-  const handleSignOut = (e) => {
+  const handleSignOut = async (e) => {
     e.preventDefault()
 
-    toast.success('Signed User Out');
+    try {
+      dispatch(logoutStart())
+      const res = await fetch('http://localhost:5000/api/users/logout')
 
+      if (!res) {
+        dispatch(logoutFailure())
+        return
+      }
+
+      const data = await res.json()
+      dispatch(logoutSuccess(data.message))
+      toast.success(data.message);
+
+    } catch (error) {
+      console.log(error);
+      dispatch(logoutFailure(error))
+    }
   }
 
   return (
     <section className=" max-w-2xl mx-auto">
       <div className='px-10 py-16 flex flex-col gap-7'>
-        <img src={ profile } alt="Profile" className='w-14 h-14 rounded-full mx-auto object-cover cursor-pointer' />
+        <img src={ currentUser?.image } alt="Profile" className='w-14 h-14 rounded-full mx-auto object-cover cursor-pointer' />
         
         <form onSubmit={handleSubmit} className='flex flex-col gap-5 '>
           <input 
@@ -127,11 +147,11 @@ const ProfileScreen = () => {
           />
 
           <button 
-            disabled={state  === 'submitting' }
+            disabled={ loading }
             type='submit' 
             className='bg-blue-800 hover:bg-blue-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center'
           >
-            {state === 'submitting' ? 'Updating...' : 'Update Profile' } <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+            { loading ? 'Updating...' : 'Update Profile' } <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
           </button>
         </form>
 
@@ -142,10 +162,10 @@ const ProfileScreen = () => {
               name="id" 
             />
             <button 
-              disabled={ state === 'submitting' }
+              disabled={ loading }
               className='flex items-center gap-2 bg-red-800 hover:bg-red-500 transition-all text-white py-2 px-6 sm:px-8 rounded-md font-semibold '
             >
-              {state === 'submitting' ? 'Deleting...' : 'Delete'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+              {loading ? 'Deleting...' : 'Delete'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
             </button>
           </form>
 
@@ -155,10 +175,10 @@ const ProfileScreen = () => {
               name="id" 
             />
             <button 
-              disabled={ state === 'submitting' }
+              disabled={ loading }
               className='flex items-center gap-2 bg-red-800 hover:bg-red-500 transition-all text-white py-2 px-6 sm:px-8 rounded-md font-semibold '
             >
-              {state === 'submitting' ? 'Signing Out...' : 'Sign Out'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+              {loading ? 'Signing Out...' : 'Sign Out'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
             </button>
           </form>
         </div>

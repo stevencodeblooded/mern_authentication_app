@@ -5,8 +5,11 @@ import authLogo from '../assets/authLogo.png'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { toast } from 'react-toastify';
+import { useDispatch, useSelector } from 'react-redux';
 
 const Loginscreen = () => {
+  const { loading, error } = useSelector( state => state.user )
+  const dispatch = useDispatch
   const navigate = useNavigate()
   const navigation = useNavigation()
   const state = navigation.state
@@ -51,6 +54,14 @@ const Loginscreen = () => {
 
     } catch (error) {
       toast.error(error?.message || error, { theme: "colored" })
+    }
+  }
+
+  const handleGoogleClick = async () => {
+    try {
+      
+    } catch (error) {
+      toast.error('Could not signup with google, try again later', error)
     }
   }
   
@@ -102,9 +113,11 @@ const Loginscreen = () => {
 
           <button 
             type='button' 
+            disabled={ loading }
+            onClick={handleGoogleClick}
             className='bg-red-800 hover:bg-red-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center'
           >
-            Continue with Google <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+            {loading ? 'Continuing with Google...' : 'Continue with Google' } <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
           </button>
         </form>
       </div>

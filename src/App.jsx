@@ -9,6 +9,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import ReferralScreen from "./container/ReferralScreen";
 import HomeScreen from "./container/HomeScreen";
 import AboutScreen from "./container/AboutScreen";
+import Error from "./components/Error";
 
 function App() {
   const router = createBrowserRouter(
@@ -18,7 +19,7 @@ function App() {
         <Route path="signup" element={<SignupScreen />} />
         <Route element={<Layout />} >
           <Route element={<ProtectedRoute />}>
-            <Route path="profile" element={<ProfileScreen />} />
+            <Route path="profile" errorElement={<Error />} element={<ProfileScreen />} />
             <Route path="referral" element={<ReferralScreen />} />
             <Route path="home" element={<HomeScreen />} />
             <Route path="about" element={<AboutScreen />} />
