@@ -7,9 +7,9 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: 'http://localhost:5000',
+        target: import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:5000',
         changeOrigin: true,
-        secure: false, // Set to true if your backend is using HTTPS
+        secure: true, // Set to true if your backend is using HTTPS
       },
     },
   },
