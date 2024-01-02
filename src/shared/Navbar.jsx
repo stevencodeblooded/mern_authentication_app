@@ -1,13 +1,15 @@
 import { Link } from 'react-router-dom'
 import logo from '../assets/authLogo.png'
-import profilePic from '../assets/profile_pic.jpeg'
 import { useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons'
 import { useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
+import { logoutFailure, logoutStart, logoutSuccess } from '../redux/slices/authSlice'
 
 const Navbar = () => {
   const { currentUser } = useSelector( state => state.user )
+  const dispatch = useDispatch()
   const [showProfileDropDown, setShowProfileDropDown] = useState(false);
   const timeoutRef = useRef(null);
 
@@ -23,10 +25,22 @@ const Navbar = () => {
   };
 
 
-  const handleLogOut = (e) => {
+  const handleLogOut = async (e) => {
     e.preventDefault()
 
-    toast.success('Signed User Out');
+    try {
+      dispatch(logoutStart())
+      const res = await fetch('/api/users/logout')
+
+      if (res.ok) {
+        const data = await res.json()
+        dispatch(logoutSuccess(data.message))
+        toast.success(data.message);
+      }
+
+    } catch (error) {
+      dispatch(logoutFailure(error))
+    }
   }
 
   return (
@@ -54,10 +68,10 @@ const Navbar = () => {
                   <div className='bg-blue-600 px-3 py-6 rounded-md shadow shadow-blue-900 w-72'>
                     <div className='flex flex-col gap-6'>
                       <div className='flex items-center gap-2'>
-                        <img src={currentUser.image} alt="profile" className='w-12 h-12 rounded-full' />
+                        <img src={currentUser?.image} alt="profile" className='w-12 h-12 rounded-full' />
                         <div>
-                          <h3 className='text-md font-semibold'>{ currentUser.name }</h3>
-                          <p className='text-sm font-normal'>{ currentUser.email }</p>
+                          <h3 className='text-md font-semibold'>{ currentUser?.name }</h3>
+                          <p className='text-sm font-normal'>{ currentUser?.email }</p>
                         </div>
                       </div>
                       <form onSubmit={handleLogOut}>

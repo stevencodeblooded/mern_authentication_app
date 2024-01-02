@@ -1,30 +1,56 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toast } from 'react-toastify';
-import { useNavigation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useDispatch } from 'react-redux';
 import { deleteUserFailure, deleteUserStart, deleteUserSuccess, logoutFailure, logoutStart, logoutSuccess, updateUserFailure, updateUserStart, updateUserSuccess } from '../redux/slices/authSlice';
+import { getStorage, uploadBytesResumable, ref, getDownloadURL } from 'firebase/storage'
+import { app } from '../firebase/firebase'
 
 const ProfileScreen = () => {
 
-  const { currentUser, loading } = useSelector( state => state.user)
+  const { currentUser, updateLoading, logoutLoading, deleteLoading } = useSelector( state => state.user)
   const userId = currentUser?._id
+  const fileRef = useRef(null)
   const dispatch = useDispatch()
   const navigate = useNavigate()
-  const navigation = useNavigation()
-  const state = navigation.state
-  const [formData, setFormDate] = useState({
+  const [formData, setFormData] = useState({
     name: currentUser?.name,
     email: currentUser?.email,
-    password: ""
+    password: "",
+    image: ""
   });
+
+  const [file, setFile] = useState(undefined);
+  const [filePerc, setFilePerc] = useState(0);
+  const [fileUploadError, setFileUploadError] = useState(false);
+
+  useEffect(() => {
+    if (file) {
+      const storage = getStorage(app)
+      const fileName = new Date().getTime() + file.name
+      const storageRef = ref(storage, fileName)
+      
+      const uploadTask = uploadBytesResumable(storageRef, file)
+      uploadTask.on('state_changed', (snapshot) => {
+        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+        setFilePerc(Math.round(progress))
+      }, (error) => {
+        setFileUploadError(true)
+      },
+      () => {
+        getDownloadURL(uploadTask.snapshot.ref).then
+          ((downloadURL) => setFormData({ ...formData, image: downloadURL }) )
+      })
+    }
+  }, [file])
 
   const handleChange = (e) => {
     const { name, value } = e.target
 
-    setFormDate((prev) => {
+    setFormData((prev) => {
       return {
         ...prev,
         [name]: value
@@ -98,17 +124,13 @@ const ProfileScreen = () => {
       dispatch(logoutStart())
       const res = await fetch('/api/users/logout')
 
-      if (!res) {
-        dispatch(logoutFailure())
-        return
+      if (res.ok) {
+        const data = await res.json()
+        dispatch(logoutSuccess(data.message))
+        toast.success(data.message);
       }
 
-      const data = await res.json()
-      dispatch(logoutSuccess(data.message))
-      toast.success(data.message);
-
     } catch (error) {
-      console.log(error);
       dispatch(logoutFailure(error))
     }
   }
@@ -116,7 +138,22 @@ const ProfileScreen = () => {
   return (
     <section className=" max-w-2xl mx-auto">
       <div className='px-10 py-16 flex flex-col gap-7'>
-        <img src={ currentUser?.image } alt="Profile" className='w-14 h-14 rounded-full mx-auto object-cover cursor-pointer' />
+
+        <input type="file" hidden ref={fileRef} accept='image/*' onChange={ (e) => setFile(e.target.files[0]) } />
+        <img 
+          src={ formData.image || currentUser?.image } 
+          alt="Profile" onClick={ () => fileRef.current.click() } 
+          className='w-14 h-14 rounded-full mx-auto object-cover cursor-pointer' 
+        />
+
+        <p className=' text-sm self-center font-semibold'>
+        {
+          fileUploadError ? <span className=' text-red-600'>Error Uploading Image</span> 
+            : filePerc > 0 && filePerc < 100 ? <span className=' text-teal-900'>Uploading { filePerc }%</span> 
+            : filePerc === 100 ? <span className=' text-blue-600'>Image Successfully Uploaded</span>
+            : ''
+        }
+        </p>
         
         <form onSubmit={handleSubmit} className='flex flex-col gap-5 '>
           <input 
@@ -147,11 +184,11 @@ const ProfileScreen = () => {
           />
 
           <button 
-            disabled={ loading }
+            disabled={ updateLoading }
             type='submit' 
-            className={`${ loading ? 'bg-gray-400' : 'bg-blue-800'} hover:bg-blue-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center`}
+            className={`${ updateLoading ? 'bg-gray-400' : 'bg-blue-800'} hover:bg-blue-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center`}
           >
-            { loading ? 'Updating...' : 'Update Profile' } <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+            { updateLoading ? 'Updating...' : 'Update Profile' } <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
           </button>
         </form>
 
@@ -162,10 +199,10 @@ const ProfileScreen = () => {
               name="id" 
             />
             <button 
-              disabled={ loading }
+              disabled={ deleteLoading }
               className='flex items-center gap-2 bg-red-800 hover:bg-red-500 transition-all text-white py-2 px-6 sm:px-8 rounded-md font-semibold '
             >
-              {loading ? 'Deleting...' : 'Delete'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+              {deleteLoading ? 'Deleting...' : 'Delete'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
             </button>
           </form>
 
@@ -175,10 +212,10 @@ const ProfileScreen = () => {
               name="id" 
             />
             <button 
-              disabled={ loading }
+              disabled={ logoutLoading }
               className='flex items-center gap-2 bg-red-800 hover:bg-red-500 transition-all text-white py-2 px-6 sm:px-8 rounded-md font-semibold '
             >
-              {loading ? 'Signing Out...' : 'Sign Out'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+              {logoutLoading ? 'Signing Out...' : 'Sign Out'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
             </button>
           </form>
         </div>

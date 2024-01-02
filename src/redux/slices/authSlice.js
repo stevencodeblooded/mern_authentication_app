@@ -3,7 +3,11 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
     currentUser: null,
     error: null,
-    loading: false
+    loading: false,
+    updateLoading: false,
+    deleteLoading: false,
+    logoutLoading: false,
+    googleLoading: false
 }
 
 const userSlice = createSlice({
@@ -23,16 +27,16 @@ const userSlice = createSlice({
             state.loading = false
         },
         googleSignInStart: (state) => {
-            state.loading = true
+            state.googleLoading = true
         },
         googleSignInSuccess: (state, action) => {
             state.currentUser = action.payload
             state.error = null
-            state.loading = false
+            state.googleLoading = false
         },
         googleSignInFailure: (state, action) => {
             state.error = action.payload
-            state.loading = false
+            state.googleLoading = false
         },
         signUpStart: (state) => {
             state.loading = true
@@ -47,40 +51,40 @@ const userSlice = createSlice({
             state.loading = false
         },
         updateUserStart: (state) => {
-            state.loading = true
+            state.updateLoading = true
         },
         updateUserSuccess: (state, action) => {
             state.currentUser = action.payload
             state.error = null
-            state.loading = false
+            state.updateLoading = false
         },
         updateUserFailure: (state, action) => {
             state.error = action.payload
-            state.loading = false
+            state.updateLoading = false
         },
         logoutStart: (state) => {
-            state.loading = true
+            state.logoutLoading = true
         },
         logoutSuccess: (state, action) => {
             state.currentUser = null
             state.error = null
-            state.loading = false
+            state.logoutLoading = false
         },
         logoutFailure: (state, action) => {
             state.error = action.payload
-            state.loading = false
+            state.logoutLoading = false
         },
         deleteUserStart: (state) => {
-            state.loading = true
+            state.deleteLoading = true
         },
         deleteUserSuccess: (state, action) => {
             state.currentUser = null
             state.error = null
-            state.loading = false
+            state.deleteLoading = false
         },
         deleteUserFailure: (state, action) => {
             state.error = action.payload
-            state.loading = false
+            state.deleteLoading = false
         }
     }
 })

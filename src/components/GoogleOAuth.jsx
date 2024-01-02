@@ -9,7 +9,7 @@ import { googleSignInFailure, googleSignInStart, googleSignInSuccess } from "../
 
 const GoogleOAuth = () => {
     const dispatch = useDispatch()
-    const { loading } = useSelector(state => state.user)
+    const { googleLoading } = useSelector(state => state.user)
     const navigate = useNavigate()
 
     const handleGoogleClick = async () => {
@@ -36,7 +36,7 @@ const GoogleOAuth = () => {
             dispatch(googleSignInSuccess(data.userAlreadyCreated || data.userNoPassword))
             console.log(data);
             toast.success(data.message, { theme: "colored" });
-            navigate('/profile')
+            navigate('/home')
           } else {
             const data = await res.json()
             dispatch(googleSignInFailure(data.message))
@@ -53,11 +53,11 @@ const GoogleOAuth = () => {
     <div className="flex flex-col">
         <button 
             type='button'
-            disabled={ loading }
+            disabled={ googleLoading }
             onClick={handleGoogleClick}
             className='bg-red-800 hover:bg-red-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center'
           >
-              { loading ? 'Google Signing...' : 'Continue with Google'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+              { googleLoading ? 'Google Signing...' : 'Continue with Google'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
           </button>
     </div>
   )
