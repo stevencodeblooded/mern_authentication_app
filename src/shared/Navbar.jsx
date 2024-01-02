@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import logo from '../assets/authLogo.png'
+import logo from '../assets/logo.png'
 import { useRef, useState } from 'react'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons'
@@ -44,15 +44,15 @@ const Navbar = () => {
   }
 
   return (
-    <div className='bg-blue-800'>
+    <div className='bg-blue-300'>
       <section className="max-w-4xl mx-auto">
-        <div className="px-5 py-6 flex items-center justify-between">
+        <div className="px-5 py-4 flex items-center justify-between gap-3">
           <Link to={'/'}>
-            <img src={logo} alt="Logo" className=' w-10 sm:w-14 hover:opacity-85' />
+            <img src={logo} alt="Logo" className=' w-28 sm:w-40 hover:opacity-85' />
           </Link>
-          <ul className='font-semibold text-white flex items-center gap-10'>
-            <li><Link to={'home'} className=' hover:opacity-85'>Home</Link></li>
-            <li><Link to={'about'} className=' hover:opacity-85'>About</Link></li>
+          <ul className='font-semibold text-blue-800 flex items-center gap-5 sm:gap-10'>
+            <li><Link to={'home'} className={`hover:text-blue-600 transition-all text-sm sm:text-base `}>Home</Link></li>
+            <li><Link to={'about'} className=' hover:text-blue-600 transition-all text-sm sm:text-base'>About</Link></li>
             <li className='relative'>
               <img 
                 src={currentUser?.image} 
@@ -64,8 +64,8 @@ const Navbar = () => {
               />
 
               { showProfileDropDown && (
-                <div className='absolute top-12 right-1' onMouseEnter={ showDropdown } onMouseLeave={ hideDropdown } >
-                  <div className='bg-blue-600 px-3 py-6 rounded-md shadow shadow-blue-900 w-72'>
+                <div className='absolute top-12 right-1 z-50' onMouseEnter={ showDropdown } onMouseLeave={ hideDropdown } >
+                  <div className='bg-blue-300 px-3 py-6 rounded-md shadow shadow-blue-900 w-72'>
                     <div className='flex flex-col gap-6'>
                       <div className='flex items-center gap-2'>
                         <img src={currentUser?.image} alt="profile" className='w-12 h-12 rounded-full' />
