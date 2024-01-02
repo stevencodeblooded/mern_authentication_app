@@ -7,7 +7,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/api': {
-        target: import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:5000',
+        target: process.env.VITE_BACKEND_API_URL || 'http://localhost:5000',
         changeOrigin: true,
         secure: true, // Set to true if your backend is using HTTPS
       },
