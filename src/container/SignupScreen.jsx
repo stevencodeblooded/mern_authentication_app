@@ -18,6 +18,7 @@ const Loginscreen = () => {
     email: '',
     password: ''
   });
+  const backendUrl = import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:5000';
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -34,7 +35,7 @@ const Loginscreen = () => {
 
     try {
       dispatch(signUpStart())
-      const res = await fetch('/api/users/signup', {
+      const res = await fetch(`${backendUrl}/api/users/signup`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
