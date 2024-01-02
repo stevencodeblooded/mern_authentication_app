@@ -11,6 +11,7 @@ const GoogleOAuth = () => {
     const dispatch = useDispatch()
     const { googleLoading } = useSelector(state => state.user)
     const navigate = useNavigate()
+    const backendUrl = import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:5000';
 
     const handleGoogleClick = async () => {
         try {
@@ -19,7 +20,7 @@ const GoogleOAuth = () => {
           const auth = getAuth(app)
           const result = await signInWithPopup(auth, provider)
 
-          const res = await fetch('/api/users/google', {
+          const res = await fetch(`${backendUrl}/api/users/google`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'

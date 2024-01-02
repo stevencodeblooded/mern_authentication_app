@@ -26,6 +26,7 @@ const ProfileScreen = () => {
   const [file, setFile] = useState(undefined);
   const [filePerc, setFilePerc] = useState(0);
   const [fileUploadError, setFileUploadError] = useState(false);
+  const backendUrl = import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:5000';
 
   useEffect(() => {
     if (file) {
@@ -63,7 +64,7 @@ const ProfileScreen = () => {
 
     try {
       dispatch(updateUserStart())
-      const res = await fetch(`/api/users/profile/${userId}`, {
+      const res = await fetch(`${backendUrl}/api/users/profile/${userId}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -93,7 +94,7 @@ const ProfileScreen = () => {
 
     try {
       dispatch(deleteUserStart())
-      const res = await fetch(`/api/users/profile/${userId}`, {
+      const res = await fetch(`${backendUrl}/api/users/profile/${userId}`, {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json'
@@ -122,7 +123,7 @@ const ProfileScreen = () => {
 
     try {
       dispatch(logoutStart())
-      const res = await fetch('/api/users/logout')
+      const res = await fetch(`${backendUrl}/api/users/logout`)
 
       if (res.ok) {
         const data = await res.json()

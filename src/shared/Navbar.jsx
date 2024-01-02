@@ -12,6 +12,7 @@ const Navbar = () => {
   const dispatch = useDispatch()
   const [showProfileDropDown, setShowProfileDropDown] = useState(false);
   const timeoutRef = useRef(null);
+  const backendUrl = import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:5000';
 
   const showDropdown = () => {
     clearTimeout(timeoutRef.current);
@@ -30,7 +31,7 @@ const Navbar = () => {
 
     try {
       dispatch(logoutStart())
-      const res = await fetch('/api/users/logout')
+      const res = await fetch(`${backendUrl}/api/users/logout`)
 
       if (res.ok) {
         const data = await res.json()
