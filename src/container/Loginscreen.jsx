@@ -14,6 +14,7 @@ const Loginscreen = () => {
   const dispatch = useDispatch()
   const {loading, error} = useSelector( state => state.user )
   const navigate = useNavigate()
+  const backendUrl = import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:5000';
 
   const [formData, setFormDate] = useState({
     email: '',
@@ -35,7 +36,7 @@ const Loginscreen = () => {
 
     try {
       dispatch(signInStart())
-      const res = await fetch('/api/users/auth', {
+      const res = await fetch(`${backendUrl} + /api/users/auth`, {
         method: "POST", 
         headers: {
           'Content-Type': 'application/json'
