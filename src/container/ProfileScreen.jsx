@@ -138,7 +138,7 @@ const ProfileScreen = () => {
   }
 
   return (
-    <div className='bg-blue-100'>
+    <div className='bg-blue-100 min-h-screen'>
       <section className=" max-w-2xl mx-auto ">
         <div className='px-10 py-16 flex flex-col gap-7'>
 

@@ -88,7 +88,7 @@ const Loginscreen = () => {
   }
   
   return (
-    <div className="flex">
+    <div className="flex min-h-screen">
       <div className="w-full bg-blue-100 md:w-1/2 xl:w-1/4 flex flex-col gap-8 px-10 py-16">
         <div className='flex flex-col gap-3'>
           <Link to={'/'}>
