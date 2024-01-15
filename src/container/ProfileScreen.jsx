@@ -3,8 +3,7 @@ import { faArrowUpRightFromSquare } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { deleteUserFailure, deleteUserStart, deleteUserSuccess, logoutFailure, logoutStart, logoutSuccess, updateUserFailure, updateUserStart, updateUserSuccess } from '../redux/slices/authSlice';
 import { getStorage, uploadBytesResumable, ref, getDownloadURL } from 'firebase/storage'
 import { app } from '../firebase/firebase'
@@ -20,7 +19,7 @@ const ProfileScreen = () => {
     name: currentUser?.name,
     email: currentUser?.email,
     password: "",
-    image: ""
+    image: currentUser?.image
   });
 
   const [file, setFile] = useState(undefined);
@@ -69,7 +68,8 @@ const ProfileScreen = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(formData),
+        credentials: 'include', 
       })
 
       if (res.ok) {
@@ -99,12 +99,13 @@ const ProfileScreen = () => {
         headers: {
           'Content-Type': 'application/json'
         },
+        credentials: 'include', 
       })
 
       if (res.ok) {
         const data = await res.json()
         dispatch(deleteUserSuccess(data.message))
-        toast.success(data.message, { theme: "colored" });
+        toast.warning(data.message, { theme: "colored" });
         navigate('/')
       } else {
         const data = await res.json()
@@ -128,7 +129,7 @@ const ProfileScreen = () => {
       if (res.ok) {
         const data = await res.json()
         dispatch(logoutSuccess(data.message))
-        toast.success(data.message);
+        toast.success(data.message, { theme: "colored" } );
       }
 
     } catch (error) {
@@ -137,91 +138,93 @@ const ProfileScreen = () => {
   }
 
   return (
-    <section className=" max-w-2xl mx-auto">
-      <div className='px-10 py-16 flex flex-col gap-7'>
+    <div className='bg-blue-100'>
+      <section className=" max-w-2xl mx-auto ">
+        <div className='px-10 py-16 flex flex-col gap-7'>
 
-        <input type="file" hidden ref={fileRef} accept='image/*' onChange={ (e) => setFile(e.target.files[0]) } />
-        <img 
-          src={ formData.image || currentUser?.image } 
-          alt="Profile" onClick={ () => fileRef.current.click() } 
-          className='w-14 h-14 rounded-full mx-auto object-cover cursor-pointer' 
-        />
-
-        <p className=' text-sm self-center font-semibold'>
-        {
-          fileUploadError ? <span className=' text-red-600'>Error Uploading Image</span> 
-            : filePerc > 0 && filePerc < 100 ? <span className=' text-teal-900'>Uploading { filePerc }%</span> 
-            : filePerc === 100 ? <span className=' text-blue-600'>Image Successfully Uploaded</span>
-            : ''
-        }
-        </p>
-        
-        <form onSubmit={handleSubmit} className='flex flex-col gap-5 '>
-          <input 
-            type="text" 
-            name="name" 
-            placeholder='Name' 
-            value={formData.name}
-            onChange={handleChange}
-            className='p-2 rounded-md border-black border-2 font-semibold'
+          <input type="file" hidden ref={fileRef} accept='image/*' onChange={ (e) => setFile(e.target.files[0]) } />
+          <img 
+            src={ formData.image || currentUser?.image } 
+            alt="Profile" onClick={ () => fileRef.current.click() } 
+            className='w-14 h-14 rounded-full mx-auto object-cover cursor-pointer' 
           />
 
-          <input 
-            type="email" 
-            name="email" 
-            placeholder='Email' 
-            value={formData.email}
-            onChange={handleChange}
-            className='p-2 rounded-md border-black border-2 font-semibold'
-          />
-
-          <input 
-            type="password" 
-            name="password" 
-            placeholder='Password' 
-            value={formData.password}
-            onChange={handleChange}
-            className='p-2 rounded-md border-black border-2 font-semibold'
-          />
-
-          <button 
-            disabled={ updateLoading }
-            type='submit' 
-            className={`${ updateLoading ? 'bg-gray-400' : 'bg-blue-800'} hover:bg-blue-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center`}
-          >
-            { updateLoading ? 'Updating...' : 'Update Profile' } <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
-          </button>
-        </form>
-
-        <div className='flex items-center justify-between'>
-          <form onSubmit={handleDelete}>
+          <p className=' text-sm self-center font-semibold'>
+          {
+            fileUploadError ? <span className=' text-red-600'>Error Uploading Image</span> 
+              : filePerc > 0 && filePerc < 100 ? <span className=' text-teal-900'>Uploading { filePerc }%</span> 
+              : filePerc === 100 ? <span className=' text-blue-600'>Image Successfully Uploaded</span>
+              : ''
+          }
+          </p>
+          
+          <form onSubmit={handleSubmit} className='flex flex-col gap-5 '>
             <input 
-              type="hidden" 
-              name="id" 
+              type="text" 
+              name="name" 
+              placeholder='Name' 
+              value={formData.name}
+              onChange={handleChange}
+              className='p-2 rounded-md border-black border-2 font-semibold'
             />
+
+            <input 
+              type="email" 
+              name="email" 
+              placeholder='Email' 
+              value={formData.email}
+              onChange={handleChange}
+              className='p-2 rounded-md border-black border-2 font-semibold'
+            />
+
+            <input 
+              type="password" 
+              name="password" 
+              placeholder='Password' 
+              value={formData.password}
+              onChange={handleChange}
+              className='p-2 rounded-md border-black border-2 font-semibold'
+            />
+
             <button 
-              disabled={ deleteLoading }
-              className='flex items-center gap-2 bg-red-800 hover:bg-red-500 transition-all text-white py-2 px-6 sm:px-8 rounded-md font-semibold '
+              disabled={ updateLoading }
+              type='submit' 
+              className={`${ updateLoading ? 'bg-gray-400' : 'bg-blue-800'} hover:bg-blue-500 transition-all text-white py-2 rounded-md font-semibold flex items-center gap-2 justify-center`}
             >
-              {deleteLoading ? 'Deleting...' : 'Delete'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+              { updateLoading ? 'Updating...' : 'Update Profile' } <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
             </button>
           </form>
 
-          <form onSubmit={handleSignOut}>
-            <input 
-              type="hidden" 
-              name="id" 
-            />
-            <button 
-              disabled={ logoutLoading }
-              className='flex items-center gap-2 bg-red-800 hover:bg-red-500 transition-all text-white py-2 px-6 sm:px-8 rounded-md font-semibold '
-            >
-              {logoutLoading ? 'Signing Out...' : 'Sign Out'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
-            </button>
-          </form>
+          <div className='flex items-center justify-between'>
+            <form onSubmit={handleDelete}>
+              <input 
+                type="hidden" 
+                name="id" 
+              />
+              <button 
+                disabled={ deleteLoading }
+                className='flex items-center gap-2 bg-red-800 hover:bg-red-500 transition-all text-white py-2 px-6 sm:px-8 rounded-md font-semibold '
+              >
+                {deleteLoading ? 'Deleting...' : 'Delete'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+              </button>
+            </form>
+
+            <form onSubmit={handleSignOut}>
+              <input 
+                type="hidden" 
+                name="id" 
+              />
+              <button 
+                disabled={ logoutLoading }
+                className='flex items-center gap-2 bg-red-800 hover:bg-red-500 transition-all text-white py-2 px-6 sm:px-8 rounded-md font-semibold '
+              >
+                {logoutLoading ? 'Signing Out...' : 'Sign Out'} <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+              </button>
+            </form>
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   )
 }
 

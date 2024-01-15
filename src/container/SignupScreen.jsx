@@ -18,6 +18,13 @@ const Loginscreen = () => {
     email: '',
     password: ''
   });
+
+  const [errors, setErrors] = useState({
+    name: "",
+    email: "",
+    password: ""
+  })
+
   const backendUrl = import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:5000';
 
   const handleChange = (e) => {
@@ -27,11 +34,34 @@ const Loginscreen = () => {
         ...prev,
         [name] : value
       }
+    }),
+    setErrors((prev) => {
+      return {
+        ...prev,
+        [name]: ''
+      }
     })
   }
 
   const handleFormSubmit = async (e) => {
     e.preventDefault()
+
+    // Validate form fields
+    const formErrors = {};
+    if (!formData.name.trim()) {
+      formErrors.name = 'Name is required';
+    }
+    if (!formData.email.trim()) {
+      formErrors.email = 'Email is required';
+    }
+    if (!formData.password.trim()) {
+      formErrors.password = 'Password is required';
+    }
+
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
+      return;
+    }
 
     try {
       dispatch(signUpStart())
@@ -47,12 +77,12 @@ const Loginscreen = () => {
       if (res.ok) {
         const data = await res.json()
         dispatch(signUpSuccess(data.newUser))
-        toast.success(data.message);
+        toast.success(data.message, { theme: "colored" });
         navigate('/')
       } else {
         const data = await res.json()
         dispatch(signUpFailure(data.message))
-        toast.error(data.message);
+        toast.error(data.message, { theme: "colored" });
       }
 
     } catch (error) {
@@ -60,53 +90,54 @@ const Loginscreen = () => {
       toast.error(error?.message || error, { theme: "colored" })
     }
   }
-
-  const handleGoogleClick = async () => {
-    try {
-      console.log('Google Au');
-    } catch (error) {
-      toast.error('Could not signup with google, try again later', error)
-    }
-  }
   
   return (
     <div className="flex">
-      <div className="w-full md:w-1/2 xl:w-1/4 flex flex-col gap-8 px-10 py-16">
+      <div className="w-full bg-blue-100 md:w-1/2 xl:w-1/4 flex flex-col gap-8 px-10 py-16">
         <div className='flex flex-col gap-3'>
           <Link to={'/'}>
-            <img src={authLogo} alt="Auth Logo" className=' w-20' />
+            <img src={authLogo} alt="Auth Logo" className='w-20' />
           </Link>
           <h1 className='text-3xl font-semibold'>Create your account</h1>
           <h2 className='text-lg font-semibold'>Have an account? <span><Link to={'/'} className='text-blue-400 hover:text-blue-800 transition-all hover:border-b-2 border-blue-800'>Log in now</Link></span></h2>
         </div>
         <form onSubmit={handleFormSubmit} className='flex flex-col gap-5'>
-          <input 
-            type="text" 
-            name="name" 
-            placeholder='Name'
-            className='p-2 rounded-md border-black border-2 font-semibold '
-            value={formData.name}
-            onChange={handleChange}
-          />
+          <div className='flex flex-col w-full'>
+            <input 
+              type="text" 
+              name="name" 
+              placeholder='Name'
+              className='p-2 rounded-md border-black border-2 font-semibold '
+              value={formData.name}
+              onChange={handleChange}
+            />
+            <span className="text-red-500 font-semibold text-sm">{ errors?.name }</span>
+          </div>
 
-          <input 
-            type="email" 
-            name="email" 
-            placeholder='Email'
-            className='p-2 rounded-md border-black border-2 font-semibold '
-            value={formData.email}
-            onChange={handleChange}
-          />
+          <div className='flex flex-col w-full'>
+            <input 
+              type="email" 
+              name="email" 
+              placeholder='Email'
+              className='p-2 rounded-md border-black border-2 font-semibold '
+              value={formData.email}
+              onChange={handleChange}
+            />
+            <span className="text-red-500 font-semibold text-sm">{ errors?.email }</span>
+          </div>
 
-          <input 
-            type="password" 
-            name="password" 
-            placeholder='Password'
-            className='p-2 rounded-md border-black border-2 font-semibold '
-            value={formData.password}
-            onChange={handleChange}
-          />
-
+          <div className='flex flex-col w-full'>
+            <input 
+              type="password" 
+              name="password" 
+              placeholder='Password'
+              className='p-2 rounded-md border-black border-2 font-semibold '
+              value={formData.password}
+              onChange={handleChange}
+            />
+            <span className="text-red-500 font-semibold text-sm">{ errors?.password }</span>
+          </div>
+          
           <button
             disabled={ loading }
             type='submit' 

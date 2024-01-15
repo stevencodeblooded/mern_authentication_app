@@ -12,7 +12,7 @@ import GoogleOAuth from '../components/GoogleOAuth';
 
 const Loginscreen = () => {
   const dispatch = useDispatch()
-  const {loading, error} = useSelector( state => state.user )
+  const {loading} = useSelector( state => state.user )
   const navigate = useNavigate()
   const backendUrl = import.meta.env.VITE_BACKEND_API_URL || 'http://localhost:5000';
 
@@ -21,6 +21,11 @@ const Loginscreen = () => {
     password: ''
   });
 
+  const [errors, setErrors] = useState({
+    email: "",
+    password: ""
+  })
+
   const handleChange = (e) => {
     const { name, value } = e.target
     setFormDate((prev) => {
@@ -28,11 +33,31 @@ const Loginscreen = () => {
         ...prev,
         [name] : value
       }
+    }),
+    setErrors((prev) => {
+      return {
+        ...prev,
+        [name]: ''
+      }
     })
   }
 
   const handleFormSubmit = async (e) => {
     e.preventDefault()
+
+    // Validate form fields
+    const formErrors = {};
+    if (!formData.email.trim()) {
+      formErrors.email = 'Email is required';
+    }
+    if (!formData.password.trim()) {
+      formErrors.password = 'Password is required';
+    }
+
+    if (Object.keys(formErrors).length > 0) {
+      setErrors(formErrors);
+      return;
+    }
 
     try {
       dispatch(signInStart())
@@ -64,7 +89,7 @@ const Loginscreen = () => {
   
   return (
     <div className="flex">
-      <div className="w-full md:w-1/2 xl:w-1/4 flex flex-col gap-8 px-10 py-16">
+      <div className="w-full bg-blue-100 md:w-1/2 xl:w-1/4 flex flex-col gap-8 px-10 py-16">
         <div className='flex flex-col gap-3'>
           <Link to={'/'}>
             <img src={authLogo} alt="Auth Logo" className=' w-20' />
@@ -73,23 +98,29 @@ const Loginscreen = () => {
           <h2 className='text-lg font-semibold'>Don't have an account? <span><Link to={'signup'} className='text-blue-400 hover:text-blue-800 transition-all hover:border-b-2 border-blue-800'>Sign Up</Link></span></h2>
         </div>
         <form onSubmit={handleFormSubmit} className='flex flex-col gap-5'>
-          <input 
-            type="email" 
-            name="email" 
-            placeholder='Email'
-            className='p-2 rounded-md border-black border-2 font-semibold '
-            value={formData.email}
-            onChange={handleChange}
-          />
+          <div className='flex flex-col w-full'> 
+            <input 
+              type="email" 
+              name="email" 
+              placeholder='Email'
+              className='p-2 rounded-md border-black border-2 font-semibold '
+              value={formData.email}
+              onChange={handleChange}
+            />
+            <span className="text-red-500 font-semibold text-sm">{ errors?.email }</span>
+          </div>
 
-          <input 
-            type="password" 
-            name="password" 
-            placeholder='Password'
-            className='p-2 rounded-md border-black border-2 font-semibold '
-            value={formData.password}
-            onChange={handleChange}
-          />
+          <div className='flex flex-col w-full'>
+            <input 
+              type="password" 
+              name="password" 
+              placeholder='Password'
+              className='p-2 rounded-md border-black border-2 font-semibold '
+              value={formData.password}
+              onChange={handleChange}
+            />
+            <span className="text-red-500 font-semibold text-sm">{ errors?.password }</span>
+          </div>
 
           <button 
             disabled={ loading }
